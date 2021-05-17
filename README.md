@@ -1,4 +1,4 @@
-# AutoMPG-Prediction-
+# AutoMPG-Prediction
 Linear Regression in PySpark
 
 # Linear Regression algorithm to predict mpg given various other factors known to impact mpg rating.
