@@ -11,18 +11,19 @@ from pyspark.sql import SparkSession
 ```python
 spark = SparkSession.builder.appName("AutoMPG_Linear_Regression").getOrCreate()
 ```
+
+
+```python
 # Reading the CSV File as a dataframe
 # if infer schema is given false it expects to give schema
 # if header is given false it takes its own column names like c_0,c_1...
-
-```python
-
 AutoMPG_DF = spark.read.csv("/Users/sowjanyakoka/Desktop/Spring2020/MachineLearning/AutoMPG.csv", inferSchema = True, header = True)
 ```
 
+# Question(1).What is the shape of the data contained in AutoMPG.csv?
+
 
 ```python
-#Question(1).What is the shape of the data contained in AutoMPG.csv?
 #(Answer):The shape of the data is the number of rows and columns (m = rows, n = columns) present in the dataset
 print("Shape :",(AutoMPG_DF.count(),len(AutoMPG_DF.columns)))
 ```
@@ -32,7 +33,11 @@ print("Shape :",(AutoMPG_DF.count(),len(AutoMPG_DF.columns)))
 
 
 ```python
-#Question(2).What features (or attributes) are recorded for each automobile?
+# Question(2).What features (or attributes) are recorded for each automobile?
+```
+
+
+```python
 #(Answer):The features recorded for each automobile can be known by the column names in the dataframe
 AutoMPG_Features = AutoMPG_DF.columns
 print("The features recorded for each automobile are :", AutoMPG_Features)
@@ -41,9 +46,10 @@ print("The features recorded for each automobile are :", AutoMPG_Features)
     The features recorded for each automobile are : ['mpg', 'cylinders', 'displacement', 'hp', 'weight', 'acceleration', 'model_year', 'origin', 'car_name']
 
 
+# Question(3).Provide a schema of the AutoMPG data set to verify that all relevant features contain numeric data type. 
+
 
 ```python
-#Question(3).Provide a schema of the AutoMPG data set to verify that all relevant features contain numeric data type. 
 #(Answer):Schema is the outline of the dataframe which gives us an outline(column_name, datatype, possibility of null values) of each column in the dataset
 print("The schema of the AutoMPG data set is:")
 #Displaying the schema of the dataset
@@ -66,13 +72,13 @@ AutoMPG_DF.printSchema()
 
 
 ```python
-##Question(3).Are there any columns/features that is not applicable in developing a Linear Regression algorithm?That is, does not meet the requirements/assumptions to use a Linear Regression model.
-#(Answer):Yes, the car_name column/feature is not applicable in developing a Linear Regression algorithm because it does not meet the following requirements of Linear Regression,
-#-We use numeric input variables to predict a numeric output variable.(car_name is a categorical variable)
-#-All data columns must be integer or float data type.(car_name is of string datatype) 
+## Question(3).Are there any columns/features that is not applicable in developing a Linear Regression algorithm?That is, does not meet the requirements/assumptions to use a Linear Regression model.
+# (Answer):Yes, the car_name column/feature is not applicable in developing a Linear Regression algorithm because it does not meet the following requirements of Linear Regression,
+# -We use numeric input variables to predict a numeric output variable.(car_name is a categorical variable)
+# -All data columns must be integer or float data type.(car_name is of string datatype) 
 #===================================================================================================================
-#Question(3).If so, eliminate those columns from further analysis and regenerate the schema to ensure that the ‘offending’ column is removed from further analysis. Remember, it should not be permanently removed from the dataset.
-#(Answer):
+# Question(3).If so, eliminate those columns from further analysis and regenerate the schema to ensure that the ‘offending’ column is removed from further analysis. Remember, it should not be permanently removed from the dataset.
+# (Answer):
 AutoMPG_LinearRegression_DF = AutoMPG_DF['mpg','cylinders','displacement','hp','weight','acceleration','model_year','origin']
 print("The schema of the AutoMPG_LinearRegression_DF data set is:")
 #Displaying the schema of the dataset for further analysis
@@ -92,9 +98,11 @@ AutoMPG_LinearRegression_DF.printSchema()
     
 
 
+# Question(4).Evaluate the correlation between mpg and each of the independent variables (pairwise mpg and cylinders, mpg and displacement, etc.)
+
 
 ```python
-#Question(4).Evaluate the correlation between mpg and each of the independent variables (pairwise mpg and cylinders, mpg and displacement, etc.)
+
 ##(Answer):
 #Loading the libraries for correlation function
 from pyspark.sql.functions import corr
@@ -212,9 +220,11 @@ AutoMPG_LinearRegression_DF.select(corr('mpg','origin')).show()
     
 
 
+## Question(4).On the basis of individual correlation coefficients, can you determine which independent variables are useful in predicting mpg?
+
 
 ```python
-##Question(4).On the basis of individual correlation coefficients, can you determine which independent variables are useful in predicting mpg?
+
 #Write response to your analysis as comments in your source code/notebook.
 #Remember, Correlation coefficient value ranges from -1 to +1; closer to 1, stronger the relationship.
 #====================================================================================================================
@@ -230,9 +240,11 @@ AutoMPG_LinearRegression_DF.select(corr('mpg','origin')).show()
 ##(Answer): Independent variables that are highly correlated with mpg i.e; weight, displacement, cylinders and hp are useful in predicting mpg
 ```
 
+# Question(5).Provide a listing of summary descriptive statistics such as average and standard deviation for each relevant attribute.
+
 
 ```python
-#Question(5).Provide a listing of summary descriptive statistics such as average and standard deviation for each relevant attribute.
+
 #===================================================================================================================================
 #(Answer):To see the descriptive statistics of the data set
 print("Descriptive Statistics of the data set :")
@@ -252,9 +264,11 @@ AutoMPG_LinearRegression_DF.describe().show(truncate = False)
     
 
 
+# Question(6).Collapse all independent variables/features into a single vector in preparation for Linear Regression analysis. 
+
 
 ```python
-#Question(6).Collapse all independent variables/features into a single vector in preparation for Linear Regression analysis. 
+
 #===========================================================================================================================
 #(Answer):#Feature Engineering
 #Loading vector libraries to combine all variables into one column to perform linear regression between mpg and independent variables
@@ -333,27 +347,31 @@ Model_DF.show(5,False)
     
 
 
+# Question(7).For training the regression model and its subsequent evaluation, 
+# generate the training data and test data from your refined AutoMPG dataset, the dataset will be split 80/20 
+# so that 80% of the data will be used to train the model and the remaining 20% to evaluate the model. 
+
 
 ```python
-#Question(7).For training the regression model and its subsequent evaluation, 
-#generate the training data and test data from your refined AutoMPG dataset, the dataset will be split 80/20 
-#so that 80% of the data will be used to train the model and the remaining 20% to evaluate the model. 
+
 #=================================================================================================================
 #(Answer):
 #Splitting the data for training and testing purpose
 Train_DF, Test_DF = Model_DF.randomSplit([0.80,0.20])
 ```
 
+## Question(7).Provide a shape for each dataset.
+
 
 ```python
-##Question(7).Provide a shape for each dataset.
+
 #==============================================
 ##(Answer):
 #Generating shape of training dataset
 print("Shape of Training Dataset :" ,(Train_DF.count(), len(Train_DF.columns)))
 ```
 
-    Shape of Training Dataset : (314, 2)
+    Shape of Training Dataset : (308, 2)
 
 
 
@@ -365,12 +383,14 @@ print("Shape of Training Dataset :" ,(Train_DF.count(), len(Train_DF.columns)))
 print("Shape of Testing Dataset :" ,(Test_DF.count(), len(Test_DF.columns)))
 ```
 
-    Shape of Testing Dataset : (78, 2)
+    Shape of Testing Dataset : (84, 2)
 
+
+# Question(8).Using the training data, evaluate the correlation between mpg and each of the independent 
 
 
 ```python
-#Question(8).Using the training data, evaluate the correlation between mpg and each of the independent 
+
 #Use the training data to fit a regression model to predict mpg given values for the number of cylinders, displacement, hp,  weight, acceleration, model_year and origin.
 #========================================================================================================================================================================
 #(Answer):
@@ -381,9 +401,11 @@ from pyspark.ml.regression import LinearRegression
 Linear_Model = LinearRegression(labelCol = 'mpg').fit(Train_DF)
 ```
 
+# Question(9).For the trained model, what is the y-intercept value? 
+
 
 ```python
-#Question(9).For the trained model, what is the y-intercept value? 
+
 #==================================================================
 #(Answer):
 #To see the intercept of the equation
@@ -392,7 +414,7 @@ print(Linear_Model.intercept)
 ```
 
     Intercept of the equation: 
-    -17.761877657834987
+    -19.069011096140724
 
 
 
@@ -406,12 +428,14 @@ print(Linear_Model.coefficients)
 ```
 
     Coefficients of each independent variable:
-    [-0.38406428255042524,0.02175257282762645,-0.005660947872021063,-0.007347303126901514,0.20137544057335854,0.7441960604959144,1.318677872653346]
+    [-0.6413490814226427,0.0248207687353879,-0.008320242917813208,-0.006766677247601995,0.14927995925772125,0.7529701321319436,1.7077842394292988]
 
+
+# Question(10).For the trained model, print the Mean Sum of Squared Error and R-Square values. 
 
 
 ```python
-#Question(10).For the trained model, print the Mean Sum of Squared Error and R-Square values. 
+
 #============================================================================================
 #(Answer):
 #To see the predictions using the model for the input variables 
@@ -425,9 +449,9 @@ print(Training_Predictions.r2)
 ```
 
     The Mean Square Error values for Training Data is:
-    11.05561225608178
+    10.9982702365616
     The R-Square value for Training Data is:
-    0.8250766410806196
+    0.812479772616278
 
 
 
@@ -446,9 +470,11 @@ print(Training_Predictions.r2)
             #In case of r2 the closer the value is to 1 the high is the predictive power, our r2 is 0.816
 ```
 
+# Question(11).Now that you have trained your model, evaluate it using the test data. 
+
 
 ```python
-#Question(11).Now that you have trained your model, evaluate it using the test data. 
+
 #Using the values of R-Square and Mean sum of Squared Error, what can you say about the reliability of the trained model to predict mpg with test data.
 #======================================================================================================================================================
 #(Answer): 
@@ -469,9 +495,9 @@ print(Test_Predictions.meanSquaredError)
 ```
 
     The R-Square value for Test Data is:
-    0.7904488856876198
+    0.8433537269890258
     The Mean Square Error values for Test Data is:
-    10.581780529461945
+    10.614859405188232
 
 
 
@@ -488,5 +514,3 @@ display(HTML("<style>.container { width:100% !important; }</style>"))
 ```python
 
 ```
-
-
